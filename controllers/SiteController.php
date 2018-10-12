@@ -17,7 +17,8 @@ class SiteController extends Controller
     public static function allowedDomains()
     {
         return [
-            '*'
+            '*',
+            'http://leagueFinder',
         ];
     }
     /**
@@ -25,13 +26,12 @@ class SiteController extends Controller
      */
     public function behaviors()
     {
-        
         return array_merge(parent::behaviors(), [
             'corsFilter' => [
                 'class' => \yii\filters\Cors::classname(),
                 'cors' => [
                     'Origin' => static::allowedDomains(),
-                    'Access-Control-Request-Method' => ['*'],
+                    'Access-Control-Request-Method' => ['GET', 'POST'],
                     'Access-Control-Allow-Credentials' => true,
                     'Access-Control-Max-Age' => 3600,
                 ],
@@ -44,15 +44,7 @@ class SiteController extends Controller
      */
     public function actions()
     {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
+        return [];
     }
 
     /**

@@ -1,2 +1,4 @@
 DirectoryIndex web/index.php
 Options -Indexes
+
+Header set Access-Control-Allow-Origin "*"
