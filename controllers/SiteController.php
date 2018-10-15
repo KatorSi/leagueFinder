@@ -7,8 +7,6 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
 
 class SiteController extends Controller
 {
@@ -54,12 +52,9 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        if (Yii::$app->request->isAjax) {
-            
-        }
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return json_encode(['this is test response'], JSON_UNESCAPED_UNICODE);
-        //return $this->render('index');
+
+        return 'this is test response';
     }
 
     /**
