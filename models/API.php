@@ -3,10 +3,13 @@ namespace app\models;
 
 use Yii;
 use yii\httpclient\Client;
+use app\models\SqlCreator;
 
-class API extends Model
+class API
 {
     private static $client = null;
+    private static $instance = null;
+    private static $apiUrl = 'https://api.opendota.com/api/';
 
     private function __construct()
     {
@@ -15,22 +18,36 @@ class API extends Model
 
     public static function getInstance()
     {
-        if (empty(self::$client)) {
-            self::$client = new Client();
+        if (empty(self::$instance)) {
+            self::$instance = new API();
+            self::$client = new Client(['baseUrl' => self::$apiUrl]);
         }
-        return self::$client;
+        //return self::$client;
+        return self::$instance;
     }
 
     public function sendRequest($url, $data = null, $method = 'POST')
     {
-        $response = $this->createRequest()
+        $sql = $this->createSql('items'); // insert $data from args
+        $currentUrl = str_replace([' ', '`'], '%20', $url.'?sql='.$sql);
+        $response = self::$client->createRequest()
             ->setMethod($method)
-            ->setUrl($url)
+            ->addHeaders(['content-type' => 'application/json'])
+            //->setHeaders(['Content-Length' => '100000'])
+            ->setUrl('https://api.opendota.com/api/explorer?sql=SELECT%20*%20FROM%20%20items%20')//$currentUrl)
             ->setData([])
+            ->send();
+        if ($response->isOK) {
+            Yii::error($response->data);
+            return $response->data;
+        }
+        Yii::error($currentUrl);
+        return $response->getData();
     }
 
-    public function createSql($table, $needed = '*', $method = 'SELECT', $whereStatement)
+    public function createSql($table, $needed = '*', $method = 'SELECT', $whereStatement = null)
     {
-        return $method.' '.$needed.' FROM '.$table.(!empty($whereStatement) ? 'WHERE '.$whereStatement['param'].'='.$whereStatement['value'] : '');
+        return (new SqlCreator($table, $needed, $method, $whereStatement))->getSql();
+        //return $method.' '.$needed.' FROM '.$table.(!empty($whereStatement) ? 'WHERE '.$whereStatement['param'].'='.$whereStatement['value'] : '');
     }
 }

@@ -7,6 +7,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
+use app\models\API;
 
 class SiteController extends Controller
 {
@@ -42,7 +43,17 @@ class SiteController extends Controller
      */
     public function actions()
     {
-        return [];
+        return [
+            'error' => 'site/error',
+        ];
+    }
+
+    public function actionError()
+    {
+        $exception = Yii::$app->errorHandler->exception;
+        Yii::error($exception->getName());
+        Yii::error($exception->getMessage());
+        return true;
     }
 
     /**
@@ -52,9 +63,11 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        return 'this is test response';
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $api = API::getInstance();
+        return $api->sendRequest('explorer');
+        //return 'this is test response';
     }
 
     /**
